@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"
-import { View, Text, FlatList } from "react-native"
+import { View, Text, FlatList, ActivityIndicator } from "react-native"
 import { getPopularMovies } from "../../services/api"
 import { CardFilme } from "../../components/CardFilme/CardFilme"
 import Constants from "expo-constants"
@@ -32,16 +32,21 @@ export interface Filme {
 
 export const FilmesPopulares = () => {
    const [filmesPopulares, setFilmesPopulares] = useState<Filme[]>([])
-   const [modal, setModal] = useState<boolean>(false)
    const [filmeSelecionado, setFilmeSelecionado] = useState<number>()
+   const [isCarregando, setIsCarregando] = useState<boolean>(false)
+   const [modal, setModal] = useState<boolean>(false)
 
    function oberFilmesLista() {
+      setIsCarregando(true)
       getPopularMovies()
          .then(res => {
             setFilmesPopulares(res.data.results)
          })
          .catch(err => {
             console.log(err)
+         })
+         .finally(() => {
+            setIsCarregando(false)
          })
    }
 
@@ -56,11 +61,15 @@ export const FilmesPopulares = () => {
 
    return (
       <View style={{ paddingTop: Constants.statusBarHeight, backgroundColor: themes.COLORS.fundo }}>
-         <FlatList
-            data={filmesPopulares}
-            keyExtractor={item => item.id.toString()}
-            renderItem={({ item }) => <CardFilme /*onPress={() => handleModal(item.id)}*/ filme={item} />}
-         />
+         {isCarregando ? (
+            <ActivityIndicator color={themes.COLORS.Roxo.medio} size="large" />
+         ) : (
+            <FlatList
+               data={filmesPopulares}
+               keyExtractor={item => item.id.toString()}
+               renderItem={({ item }) => <CardFilme onPress={() => handleModal(item.id)} filme={item} />}
+            />
+         )}
 
          {modal && <ModalResults filmeId={filmeSelecionado} modal={modal} setModal={setModal} />}
       </View>

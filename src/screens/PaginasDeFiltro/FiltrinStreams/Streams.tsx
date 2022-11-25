@@ -20,6 +20,7 @@ export interface Stream {
 export const Streams = () => {
    const [listaStreams, setListaStreams] = useState<Stream[]>([])
    const [streamSelected, setStreamSelected] = useState<string[]>([])
+   
    const setSearchParam = useContext(ListaContexto).setSearchParams
    const searchParam = useContext(ListaContexto).searchParams
 

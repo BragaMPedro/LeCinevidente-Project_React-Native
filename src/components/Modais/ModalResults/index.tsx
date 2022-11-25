@@ -1,10 +1,10 @@
-import { View, Modal, Image, ModalProps, TouchableOpacity, ScrollView, Text } from "react-native"
+import React, { useEffect, useState } from "react"
+import { View, Modal, Image, ModalProps, TouchableOpacity, ScrollView, Text, ActivityIndicator } from "react-native"
 import { styles } from "./styles"
 
 import CloseIcon from "../../../assets/icons/closeIcon.png"
-import themes from "../../../themes"
+import themes from "../../../themes/index"
 import { getFilmeStreamsDIsponiveis, getMovieById } from "../../../services/api"
-import { useEffect, useState } from "react"
 import { ResponseFilmeDetalhadado, StreamPais } from "./FilmeDetalhesTypes"
 
 interface ModalResultsProps extends ModalProps {
@@ -16,14 +16,20 @@ interface ModalResultsProps extends ModalProps {
 export const ModalResults = ({ modal, setModal, filmeId, ...rest }: ModalResultsProps) => {
    const [filmeFilme, setFilmeFilme] = useState<ResponseFilmeDetalhadado>()
    const [streamBR, setStreamBR] = useState<StreamPais>()
+   const [isCarregando, setIsCarregando] = useState<boolean>(false)
 
    function obterDetalhesFilmeSelecionado(id: number) {
+      setIsCarregando(true)
       getMovieById(id)
          .then(res => {
             setFilmeFilme(res.data)
          })
          .catch(err => {
             console.log(err)
+         })
+         .finally(() => {
+            setIsCarregando(false)
+            console.log(filmeFilme.title)
          })
    }
 
@@ -35,12 +41,14 @@ export const ModalResults = ({ modal, setModal, filmeId, ...rest }: ModalResults
          .catch(err => {
             console.log(err)
          })
+         .finally(() => {
+            setIsCarregando(false)
+         })
    }
 
    useEffect(() => {
       obterDetalhesFilmeSelecionado(filmeId)
-      obterStreamsDisponiveis(filmeId)
-   }, [modal])
+   }, [])
 
    return (
       <Modal
@@ -51,52 +59,56 @@ export const ModalResults = ({ modal, setModal, filmeId, ...rest }: ModalResults
             setModal(!modal)
          }}
          {...rest}>
-         <TouchableOpacity style={styles.modal}>
-            <View style={styles.modalContainer}>
-               <View style={styles.IconContainer}>
-                  <TouchableOpacity
-                     style={{ padding: 3, backgroundColor: themes.COLORS.Roxo.escuro, borderRadius: 50 }}
-                     onPress={() => setModal(!modal)}>
-                     <Image style={styles.closeIcon} source={CloseIcon} />
-                  </TouchableOpacity>
-               </View>
-
-               <View style={styles.headerContainer}>
-                  <Image
-                     style={styles.filmeImagem}
-                     source={{ uri: "https://image.tmdb.org/t/p/original" + filmeFilme.backdrop_path }}
-                     resizeMode="cover"
-                  />
-                  <View style={styles.headerRight}>
-                     <Text style={styles.text}> {filmeFilme.title} </Text>
-                     <View>
-                        {filmeFilme.genres.map(genre => {
-                           return <Text style={styles.generos}>{genre.name}</Text>
-                        })}
-                     </View>
-                     {streamBR.flatrate !== undefined ? (
-                        streamBR.flatrate.map(stream => {
-                           return (
-                              <View>
-                                 <Text style={styles.generos}>Mensal</Text>
-                                 <Image
-                                    style={styles.filmeImagem}
-                                    source={{ uri: "https://image.tmdb.org/t/p/original" + stream.logo_path }}
-                                    resizeMode="cover"
-                                 />
-                              </View>
-                           )
-                        })
-                     ) : (
-                        <View>
-                           <Text style={styles.generos}>Filme Indisponível em Stream</Text>
-                        </View>
-                     )}
+         {isCarregando ? (
+            <ActivityIndicator color={themes.COLORS.Roxo.medio} size="large" />
+         ) : (
+            <TouchableOpacity style={styles.modal}>
+               <View style={styles.modalContainer}>
+                  <View style={styles.IconContainer}>
+                     <TouchableOpacity
+                        style={{ padding: 3, backgroundColor: themes.COLORS.Roxo.escuro, borderRadius: 50 }}
+                        onPress={() => setModal(!modal)}>
+                        <Image style={styles.closeIcon} source={CloseIcon} />
+                     </TouchableOpacity>
                   </View>
+
+                  <View style={styles.headerContainer}>
+                     <Image
+                        style={styles.filmeImagem}
+                        source={{ uri: "https://image.tmdb.org/t/p/original" + filmeFilme.backdrop_path }}
+                        resizeMode="cover"
+                     />
+                     <View style={styles.headerRight}>
+                        <Text style={styles.text}> {filmeFilme.title} </Text>
+                        <View>
+                           {filmeFilme.genres.map(genre => {
+                              return <Text style={styles.generos}>{genre.name}</Text>
+                           })}
+                        </View>
+                        {streamBR.flatrate !== undefined ? (
+                           streamBR.flatrate.map(stream => {
+                              return (
+                                 <View>
+                                    <Text style={styles.generos}>Mensal</Text>
+                                    <Image
+                                       style={styles.filmeImagem}
+                                       source={{ uri: "https://image.tmdb.org/t/p/original" + stream.logo_path }}
+                                       resizeMode="cover"
+                                    />
+                                 </View>
+                              )
+                           })
+                        ) : (
+                           <View>
+                              <Text style={styles.generos}>Filme Indisponível em Stream</Text>
+                           </View>
+                        )}
+                     </View>
+                  </View>
+                  <ScrollView showsVerticalScrollIndicator={false}></ScrollView>
                </View>
-               <ScrollView showsVerticalScrollIndicator={false}></ScrollView>
-            </View>
-         </TouchableOpacity>
+            </TouchableOpacity>
+         )}
       </Modal>
    )
 }
