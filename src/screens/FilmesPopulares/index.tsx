@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"
-import { View, Text, FlatList, ActivityIndicator } from "react-native"
+import { View, FlatList, ActivityIndicator } from "react-native"
 import { getPopularMovies } from "../../services/api"
 import { CardFilme } from "../../components/CardFilme/CardFilme"
 import Constants from "expo-constants"
@@ -60,7 +60,7 @@ export const FilmesPopulares = () => {
    }, [])
 
    return (
-      <View style={{ paddingTop: Constants.statusBarHeight, backgroundColor: themes.COLORS.fundo }}>
+      <View style={{ flex: 1, paddingTop: Constants.statusBarHeight, backgroundColor: themes.COLORS.fundo }}>
          {isCarregando ? (
             <ActivityIndicator color={themes.COLORS.Roxo.medio} size="large" />
          ) : (
