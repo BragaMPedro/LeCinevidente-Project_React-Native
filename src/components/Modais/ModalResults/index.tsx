@@ -11,13 +11,13 @@ import {
 } from "react-native";
 import { styles } from "./styles";
 
-import CloseIcon from "../../../assets/icons/closeIcon.png";
 import { MaterialIcons } from "@expo/vector-icons";
 import themes from "../../../themes/index";
 import {
   getFilmeStreamsDIsponiveis,
   getMovieById,
 } from "../../../services/api";
+import { StreamsList } from "../../StreamsList/StreamsList";
 import { ResponseFilmeDetalhadado, StreamPais } from "./FilmeDetalhesTypes";
 
 interface ModalResultsProps extends ModalProps {
@@ -40,6 +40,8 @@ export const ModalResults = ({
     getMovieById(id)
       .then((res) => {
         setFilmeFilme(res.data);
+        console.log(res.data.title);
+        
       })
       .catch((err) => {
         console.log(err);
@@ -66,7 +68,7 @@ export const ModalResults = ({
 
   return (
     <Modal
-      animationType="slide" 
+      animationType="fade"
       transparent={true}
       visible={modal}
       onRequestClose={() => {
@@ -79,7 +81,6 @@ export const ModalResults = ({
           <ActivityIndicator color={themes.COLORS.Roxo.medio} size="large" />
         ) : (
           <View style={styles.modalContainer}>
-
             <View style={styles.headerContainer}>
               <TouchableOpacity
                 style={styles.IconContainer}
@@ -90,21 +91,21 @@ export const ModalResults = ({
                   size={24}
                   color={themes.COLORS.Roxo.maisClaro}
                 />
-                <Text style={styles.title}> {filmeFilme.title} </Text>
-                <Image
-                  style={styles.filmeImagem}
-                  source={{
-                    uri:
-                      "https://image.tmdb.org/t/p/original" +
-                      (filmeFilme.backdrop_path !== undefined
-                        ? filmeFilme.backdrop_path
-                        : filmeFilme.poster_path),
-                  }}
-                  resizeMode="cover"
-                />
               </TouchableOpacity>
+              <Text style={styles.title}> {filmeFilme.title} </Text>
+              <Image
+                style={styles.filmeImagem}
+                source={{
+                  uri:
+                    "https://image.tmdb.org/t/p/original" +
+                    (filmeFilme.backdrop_path !== undefined
+                      ? filmeFilme.backdrop_path
+                      : filmeFilme.poster_path),
+                }}
+                resizeMode="cover"
+              />
             </View>
-            <View style={styles.headerContainer}>
+            <View style={styles.headerInfo}>
               <View>
                 {filmeFilme.genres.map((genre) => {
                   return (
@@ -114,32 +115,10 @@ export const ModalResults = ({
                   );
                 })}
               </View>
-              {streamBR.flatrate !== undefined ? (
-                streamBR.flatrate.map((stream) => {
-                  return (
-                    <View>
-                      <Text style={styles.generos}>Mensal</Text>
-                      <Image
-                        style={styles.streamImagem}
-                        source={{
-                          uri:
-                            "https://image.tmdb.org/t/p/original" +
-                            stream.logo_path,
-                        }}
-                        resizeMode="cover"
-                      />
-                    </View>
-                  );
-                })
-              ) : (
-                <View>
-                  <Text style={styles.generos}>
-                    Filme Indisponível em Stream
-                  </Text>
-                </View>
-              )}
+
+              <StreamsList streams={streamBR} />
+
             </View>
-            <ScrollView showsVerticalScrollIndicator={false}></ScrollView>
           </View>
         )}
       </TouchableOpacity>

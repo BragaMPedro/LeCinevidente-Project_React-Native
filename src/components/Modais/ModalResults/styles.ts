@@ -18,7 +18,11 @@ export const styles = StyleSheet.create({
         flexDirection: "column",
         justifyContent: 'space-between',
         alignContent: 'center',
+        borderWidth: 1,
+        borderColor: themes.COLORS.Roxo.escuro,
         borderRadius: 10,
+        paddingBottom: 14,
+
         shadowColor: "#000",
         shadowOffset: {
             width: 0,
@@ -33,11 +37,12 @@ export const styles = StyleSheet.create({
         flexDirection: 'column',
         justifyContent: 'space-between',
         height: 100,
+        marginBottom: 14,
     },
     
     IconContainer:{
         width: "100%",
-        margin: 5,
+        padding: 5,
         alignItems: 'flex-end',
     },
 
@@ -47,16 +52,21 @@ export const styles = StyleSheet.create({
 
     title: {
         width: "100%",
-        zIndex:2,
-        fontSize: 20,
+        padding: 5,
+        fontSize: 24,
         fontWeight: 'bold',
         textAlign: 'left',
         color: themes.COLORS.Roxo.maisClaro,
     },
 
-    generos:{
-        justifyContent: 'space-between'
+    headerInfo:{
+        flexDirection: 'row',
+        justifyContent: 'space-around',
     },
+
+    generos: {
+        justifyContent: "space-between",
+      },    
 
     filmeImagem: {
         position: 'absolute',
@@ -70,10 +80,5 @@ export const styles = StyleSheet.create({
         opacity: 0.5,
     },
 
-    streamImagem: {
-        width: 30,
-        height: 30,
-        borderRadius: 7,
-    },
    
 })
