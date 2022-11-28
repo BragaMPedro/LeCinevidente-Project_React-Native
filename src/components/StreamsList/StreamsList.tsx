@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { StreamPais } from "../Modais/ModalResults/FilmeDetalhesTypes";
-import { StreamsRow } from "../StreamRow/StreamRow"
-import { View, Text } from "react-native";
+import { StreamPais, StreamMetodoPagamento } from "../Modais/ModalResults/FilmeDetalhesTypes";
+import { View, Text, FlatList, Image } from "react-native";
 
 import { styles } from "./styles";
 
@@ -10,28 +9,41 @@ interface StreamListProps {
 }
 
 export const StreamsList = ({ streams }: StreamListProps) => {
-  const [mensalExist, setMensalExist] = useState<boolean>(true);
-  const [aluguellExist, setAluguelExist] = useState<boolean>(true);
-  const [compraExist, setCompraExist] = useState<boolean>(true);
+  const [listaStreams, setListaStreams] = useState<StreamMetodoPagamento[]>([]);
+
+  function addStream(streams: StreamPais){
+    streamFromArray(streams.flatrate)
+    streamFromArray(streams.buy)
+    streamFromArray(streams.rent)
+  }
+
+  function streamFromArray(streamType: StreamMetodoPagamento[]) {
+    streamType !== undefined &&
+      streamType.map((stream) => {
+
+        setListaStreams([...listaStreams, stream])
+      })
+  }
 
   useEffect(() => {
-    streams.flatrate === undefined && setMensalExist(false);
-    streams.rent === undefined && setAluguelExist(false);
-    streams.buy === undefined && setCompraExist(false);
+    addStream(streams)
   }, []);
 
   return (
     <View style={styles.streamsContainer}>
-      {mensalExist &&
-      <StreamsRow streamType={streams.flatrate}/>}
 
-      {aluguellExist &&
-      <StreamsRow streamType={streams.rent}/>}
+      <FlatList
+        data={listaStreams}
+        keyExtractor={item => item.provider_id.toString()}
+        numColumns={3}
+        renderItem={({ item }) => <Image
+          style={styles.streamImagem}
+          source={{ uri: "https://image.tmdb.org/t/p/original" + item.logo_path }}
+          resizeMode="cover"
+        />}
+      />
 
-      {compraExist &&
-      <StreamsRow streamType={streams.buy}/>}
-
-      { (mensalExist && aluguellExist && compraExist === false) && (
+      {listaStreams.length < 1 && (
         <View>
           <Text style={styles.generos}>Filme Indisponível em Stream</Text>
         </View>

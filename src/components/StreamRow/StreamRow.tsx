@@ -11,8 +11,6 @@ interface StreamRowProps {
 export const StreamsRow = ({ streamType }: StreamRowProps) => {
     return(
         <View style={styles.streamType}>
-            <Text style={styles.generos}>Mensal:</Text>
-
             {streamType.map((stream) => (
                 <Image
                 key={stream.provider_id}
